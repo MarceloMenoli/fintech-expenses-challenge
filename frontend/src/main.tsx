@@ -6,6 +6,7 @@ import { AuthProvider } from './auth';
 import { AuthPage } from './pages/AuthPage';
 import { Layout } from './components/Layout';
 import { CategoriesPage } from './pages/CategoriesPage';
+import { TransactionsPage } from './pages/TransactionsPage';
 import './styles.css';
 import './workspace.css';
 
@@ -14,6 +15,6 @@ const queryClient = new QueryClient({ defaultOptions: { queries: { retry: 1, sta
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode><QueryClientProvider client={queryClient}><BrowserRouter><AuthProvider><Routes>
     <Route path="/login" element={<AuthPage />} /><Route path="/register" element={<AuthPage register />} />
-    <Route element={<Layout />}><Route path="/categories" element={<CategoriesPage />} /><Route path="*" element={<p>Seu espaço financeiro está sendo preparado.</p>} /></Route>
+    <Route element={<Layout />}><Route path="/categories" element={<CategoriesPage />} /><Route path="/transactions" element={<TransactionsPage />} /><Route path="*" element={<p>Seu espaço financeiro está sendo preparado.</p>} /></Route>
   </Routes></AuthProvider></BrowserRouter></QueryClientProvider></React.StrictMode>,
 );
