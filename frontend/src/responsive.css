@@ -1,0 +1,19 @@
+.summary-caption .live-dot {
+  margin-left: 0;
+}
+.profile small {
+  white-space: nowrap;
+}
+.greeting-dot {
+  color: #819d58;
+  font-size: 23px;
+}
+
+@media (max-width: 760px) {
+  .panel-heading {
+    flex-wrap: wrap;
+  }
+  .panel-heading .heading-actions {
+    flex-wrap: wrap;
+  }
+}

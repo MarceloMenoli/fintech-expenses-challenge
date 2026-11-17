@@ -3,7 +3,12 @@ import { useQueryClient } from '@tanstack/react-query';
 import { api } from './api';
 import type { Session, User } from './types';
 
-interface AuthState { user: User | null; authenticate: (session: Session) => void; logout: () => void; expired: boolean }
+interface AuthState {
+  user: User | null;
+  authenticate: (session: Session) => void;
+  logout: () => void;
+  expired: boolean;
+}
 const AuthContext = createContext<AuthState | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -16,13 +21,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     client.clear();
   }, [client]);
   useEffect(() => {
-    const id = api.interceptors.response.use((response) => response, (error: unknown) => {
-      if (typeof error === 'object' && error !== null && 'response' in error) {
-        const response = error.response as { status?: number } | undefined;
-        if (response?.status === 401 && api.defaults.headers.common.Authorization) { logout(); setExpired(true); }
-      }
-      return Promise.reject(error);
-    });
+    const id = api.interceptors.response.use(
+      (response) => response,
+      (error: unknown) => {
+        if (typeof error === 'object' && error !== null && 'response' in error) {
+          const response = error.response as { status?: number } | undefined;
+          if (response?.status === 401 && api.defaults.headers.common.Authorization) {
+            logout();
+            setExpired(true);
+          }
+        }
+        return Promise.reject(error);
+      },
+    );
     return () => api.interceptors.response.eject(id);
   }, [logout]);
   function authenticate(session: Session) {
@@ -31,7 +42,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(session.user);
     setExpired(false);
   }
-  return <AuthContext.Provider value={{ user, authenticate, logout, expired }}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ user, authenticate, logout, expired }}>
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
 export function useAuth() {
