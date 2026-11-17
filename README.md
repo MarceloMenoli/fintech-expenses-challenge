@@ -1,33 +1,48 @@
-# Gest?o financeira corporativa
+﻿# Fluxo — Gestão financeira corporativa
 
-MVP do desafio t?cnico NestJS + React: autentica??o, categorias, transa??es e dashboard com dados isolados por usu?rio.
+MVP do desafio técnico NestJS + React: registro e login, categorias, transações financeiras e dashboard com dados isolados por usuário.
 
-## Estado atual
+- **Repositório público:** https://github.com/MarceloMenoli/fintech-expenses-challenge
+- **Deploy público:** pendente da conexão às contas Railway e Vercel. Os arquivos de publicação já estão versionados; ainda não existe uma URL de produção verificada.
+- **Demonstração local:** http://localhost:5173
+- **Conta seed:** `demo@fluxo.app` / `Demo@2026!` — credenciais exclusivamente demonstrativas.
 
-Estrutura inicial de backend e frontend. As funcionalidades de neg?cio ser?o implementadas nos pr?ximos commits; esta vers?o ainda n?o ? a entrega final do desafio.
+## Funcionalidades
 
-## Stack e decis?es
+- Cadastro com nome, e-mail único e senha com hash bcrypt; login JWT e rotas protegidas.
+- CRUD de categorias com descrição opcional. Categorias usadas por transações não podem ser excluídas.
+- Criação, consulta, edição e exclusão de transações próprias.
+- Filtros combináveis por tipo, categoria e datas, com paginação.
+- Dashboard calculado na API: saldo histórico, entradas e saídas do período e três categorias com maior soma de saídas.
+- Interface responsiva com estados de carregamento, listas vazias, confirmação de exclusão e feedback de sucesso/erro.
 
-- NestJS com TypeScript strict e m?dulos separados por responsabilidade.
-- React com TypeScript, Vite e React Router, usando componentes funcionais.
-- TanStack Query para estado remoto: cache, consultas e invalida??o ap?s altera??es. A autentica??o usar? Context API.
-- PostgreSQL e Prisma para persist?ncia com migrations versionadas.
-- npm workspaces para instalar e executar as duas aplica??es pela raiz.
+## Stack e decisões
 
-## Pr?-requisitos
+**Backend:** NestJS 11, TypeScript strict, Prisma 7, PostgreSQL 17, `@nestjs/jwt`, class-validator e class-transformer. Módulos Auth, Users, Categories, Transactions e Dashboard, com um serviço Prisma compartilhado. O adapter PostgreSQL tem timeout de conexão e limite de conexões explícitos.
 
-- Node.js 22.14 ou superior na linha 22 e npm 10 ou superior.
-- PostgreSQL 17, local ou via Docker Desktop, para a etapa de banco.
+**Frontend:** React 19, Vite, React Router, Axios e TanStack Query. Componentes funcionais e hooks. TanStack Query controla dados remotos, cache e invalidação após mutações, incluindo os indicadores do dashboard. Context API mantém o usuário e o token em memória; a sessão exige novo login após recarregar a página. Não há necessidade de outra biblioteca de estado global neste escopo.
 
-## Desenvolvimento local
+**Domínio:** valores positivos em centavos inteiros, sem cálculos monetários de negócio no frontend; datas civis em `YYYY-MM-DD`, sem deslocamento de fuso. Tipos `INCOME` e `EXPENSE`. O proprietário vem do token, nunca do corpo. A chave estrangeira composta também impede no banco o vínculo entre uma transação e a categoria de outro usuário.
 
-Na raiz do projeto:
+**Organização:** npm workspaces, com `backend/` e `frontend/`. Sem microsserviços, filas ou camadas adicionais sem necessidade. Docker é uma conveniência local e o formato de publicação da API no Railway.
+
+## Executar localmente
+
+Requisitos: **Node.js 22.14+ na linha 22**, **npm 10+** e **PostgreSQL 17**. Para os comandos abaixo, Docker Desktop deve estar iniciado. Também é possível usar PostgreSQL instalado e ajustar `DATABASE_URL`.
+
+Na raiz, em PowerShell:
 
 ```powershell
 npm ci
 Copy-Item backend/.env.example backend/.env
 Copy-Item frontend/.env.example frontend/.env
+docker compose up -d
+npm run db:generate
+npm run db:deploy
+npm run db:seed
 ```
+
+Substitua `JWT_SECRET` por um segredo aleatório com pelo menos 32 caracteres. No Linux/macOS, substitua `Copy-Item` por `cp`.
 
 Em terminais separados:
 
@@ -41,18 +56,144 @@ npm run dev:frontend
 
 - Frontend: http://localhost:5173
 - API: http://localhost:3000/api
-- Verifica??o da API: `GET http://localhost:3000/api/health`
+- Healthcheck: http://localhost:3000/api/health
+- PostgreSQL local do Compose: `localhost:5434`, banco `fintech`.
 
-## Verifica??es
+A porta 5434 evita conflito com outras instalações de PostgreSQL. As credenciais locais do Compose são apenas para desenvolvimento. O seed é idempotente: cria categorias e transações no mês atual e preserva as alterações de uma conta já populada.
+
+Para desligar o PostgreSQL sem apagar dados: `docker compose stop`.
+
+## Variáveis de ambiente
+
+| Aplicação | Variável                 | Uso                                                           |
+| --------- | ------------------------ | ------------------------------------------------------------- |
+| Backend   | `DATABASE_URL`           | Conexão PostgreSQL do ambiente atual                          |
+| Backend   | `JWT_SECRET`             | Segredo aleatório com pelo menos 32 caracteres                |
+| Backend   | `JWT_EXPIRES_IN_SECONDS` | Validade do JWT; padrão 3600, entre 60 e 86400                |
+| Backend   | `FRONTEND_URL`           | Origem exata autorizada pelo CORS, sem barra final            |
+| Backend   | `PORT`                   | Porta da API; padrão 3000, fornecida pelo Railway em produção |
+| Testes    | `TEST_DATABASE_URL`      | Banco exclusivo de testes, cujo nome termina em `_test`       |
+| Frontend  | `VITE_API_URL`           | URL pública da API incluindo `/api`, definida durante o build |
+
+Use as mesmas origens no navegador e no CORS: `localhost` e `127.0.0.1` são origens diferentes. Não versione arquivos `.env`. As variáveis `VITE_*` são públicas; não coloque segredos nelas.
+
+## Banco e migrations
 
 ```powershell
+# Aplicar as migrations versionadas, inclusive em banco vazio:
+npm run db:deploy
+
+# Criar uma nova migration durante o desenvolvimento:
+npm run db:migrate -- --name descricao_da_alteracao
+npm run db:generate
+
+# Popular a demonstração:
+npm run db:seed
+```
+
+A migration inicial inclui índices por proprietário/data e restrição de valor positivo. Em produção use `db:deploy`, nunca `migrate dev`. O seed não é executado automaticamente a cada deploy.
+
+## Verificações e testes
+
+Crie um banco separado uma única vez:
+
+```powershell
+docker compose exec -T postgres createdb -U fintech fintech_test
+```
+
+Configure `TEST_DATABASE_URL` em `backend/.env`, conforme o exemplo. Os testes recusam um banco cujo nome não termine em `_test` e recusam a URL de desenvolvimento. **O conteúdo desse banco exclusivo é limpo pelos testes de integração.**
+
+```powershell
+npm run db:generate
 npm run lint
 npm run typecheck
 npm run build
+npm test
 ```
 
-## Roteiro e entrega
+A suíte Jest/Supertest usa PostgreSQL real e aplica as migrations. Os 11 cenários cobrem cadastro e duplicidade, login, tokens ausentes/inválidos/expirados, isolamento entre usuários, categorias de terceiros, filtros e paginação, valores e datas inválidas, dashboard com e sem dados, exclusão vinculada e edição de recursos próprios.
 
-Consulte [PASSO_A_PASSO.md](PASSO_A_PASSO.md). O prazo de trabalho foi concentrado em dois dias: backend e testes no primeiro; interface, deploy e documenta??o no segundo.
+Testes de navegador com Playwright percorrem o fluxo completo em desktop e celular, utilizando API própria na porta 3001, frontend na 5174 e o banco exclusivo de testes:
 
-Reposit?rio p?blico, deploy e testes de neg?cio ainda pendentes. Os links e credenciais de demonstra??o ser?o documentados quando estiverem dispon?veis.
+```powershell
+npx playwright install chromium
+npm run test:ui
+```
+
+No Windows, para usar o Chrome já instalado em vez de baixar Chromium:
+
+```powershell
+$env:PLAYWRIGHT_CHANNEL = 'chrome'
+npm run test:ui
+```
+
+`npm run format:check` verifica formatação e `npm run format` a aplica. O GitHub Actions executa lint, tipos, builds, testes de API e testes de navegador com PostgreSQL temporário.
+
+## API
+
+Rotas privadas usam `Authorization: Bearer <token>`.
+
+| Método               | Rota sob `/api`     | Comportamento                                  |
+| -------------------- | ------------------- | ---------------------------------------------- |
+| GET                  | `/health`           | Estado da aplicação                            |
+| POST                 | `/auth/register`    | Cadastro e retorno de sessão                   |
+| POST                 | `/auth/login`       | Login e retorno de sessão                      |
+| GET                  | `/auth/me`          | Usuário autenticado sem hash de senha          |
+| GET / POST           | `/categories`       | Listar / criar categorias próprias             |
+| PATCH / DELETE       | `/categories/:id`   | Editar / excluir categoria própria             |
+| GET / POST           | `/transactions`     | Listar / criar transações próprias             |
+| GET / PATCH / DELETE | `/transactions/:id` | Consultar / editar / excluir transação própria |
+| GET                  | `/dashboard`        | Indicadores do usuário autenticado             |
+
+Cadastro recebe `{ "name": "Ana", "email": "ana@example.com", "password": "SenhaSegura123!" }`. Login recebe e-mail e senha. Ambos retornam `{ "data": { "user": { "id", "name", "email" }, "accessToken": "..." } }` (campos do usuário ilustrados).
+
+Exemplo de transação:
+
+```json
+{
+  "description": "Assinatura mensal",
+  "amount": 9990,
+  "type": "EXPENSE",
+  "date": "2026-11-17",
+  "categoryId": "UUID_DA_CATEGORIA"
+}
+```
+
+- Listagem: `page` (padrão 1), `limit` (padrão 20, máximo 100), `type`, `categoryId`, `startDate` e `endDate`. Ordenação por data decrescente e ID decrescente como desempate.
+- Dashboard: `startDate` e `endDate`; saldo sempre histórico. Sem datas, os totais consideram todo o histórico. Períodos incluem os dois extremos; início posterior ao fim retorna 400.
+- Sucessos: `{ "data": ... }`; listagens paginadas: `{ "data": [], "meta": { "page", "limit", "total", "totalPages" } }` (campos de metadados ilustrados).
+- Dashboard: `{ "data": { "balance": 0, "income": 0, "expense": 0, "topCategories": [] } }`.
+- Erros: `{ "statusCode": 400, "message": "...", "error": "..." }`; validações podem retornar uma lista em `message`.
+- Status: criação 201, consulta/edição/exclusão/login 200, validação 400, autenticação 401, recurso indisponível 404 e conflito 409. Exclusão retorna `{ "data": null }`.
+
+## Publicação no Railway e na Vercel
+
+### API e PostgreSQL — Railway
+
+1. Criar um projeto com PostgreSQL e um serviço vinculado a este repositório, branch `master`.
+2. Manter a raiz do serviço na raiz do repositório. `railway.json` usa `backend/Dockerfile`, aplica migrations no pre-deploy e inicia `npm run start -w backend`.
+3. Configurar `DATABASE_URL` pela referência ao banco, `JWT_SECRET` aleatório, `JWT_EXPIRES_IN_SECONDS=3600` e `FRONTEND_URL` com a origem pública da Vercel. Para o primeiro deploy, pode usar temporariamente a origem local, ajustando antes da validação pública.
+4. Gerar domínio público para a API e verificar `/api/health`.
+5. Executar `npm run db:seed` uma vez no ambiente do serviço para disponibilizar a demonstração.
+
+O container roda como usuário sem privilégios. O build não usa nem incorpora arquivos `.env`. O banco de desenvolvimento e o banco de testes não devem ser os de produção.
+
+### Frontend — Vercel
+
+1. Importar este repositório e selecionar `frontend` como Root Directory, com preset Vite e Node 22.
+2. Usar os comandos versionados em `frontend/vercel.json`: instalação `npm ci --prefix ..`, build `npm run build` e saída `dist`, executados a partir de `frontend`. Permitir acesso aos arquivos do workspace fora da Root Directory.
+3. Definir `VITE_API_URL=https://DOMINIO_DA_API/api` e publicar. `frontend/vercel.json` encaminha as rotas da SPA para `index.html`.
+4. Atualizar `FRONTEND_URL` do Railway para a origem exata publicada e fazer redeploy da API.
+5. Validar cadastro, login, categorias, transações, filtros, indicadores e acesso direto a `/transactions` por HTTPS. Atualizar os links no início deste README.
+
+### Estado da entrega
+
+Código, migrations, seed e configuração de deploy estão implementados. A publicação efetiva e a validação das URLs de produção dependem de acesso às contas Railway e Vercel; não foram declaradas concluídas.
+
+## Limitações conhecidas
+
+- BRL como única moeda; sem transferências, recorrências ou recuperação de senha.
+- Token em memória: recarregar a página encerra a sessão; sem refresh token neste MVP.
+- A conta demonstrativa é compartilhada. Dados de outras contas continuam isolados.
+- A auditoria de dependências de execução foi verificada após a atualização do Prisma. Há alertas transitivos nas ferramentas de desenvolvimento, incluindo a cadeia de glob de Jest/Vite; não foi aplicado `audit fix --force` nem substituições de versões sem compatibilidade verificada. Reavaliar as correções disponíveis antes de expandir o projeto.
+- Não há fluxos de administração de usuários nem endurecimento adicional de uma plataforma financeira de produção, como auditoria de alterações ou recuperação de contas.
