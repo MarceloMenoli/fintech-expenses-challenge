@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { PrismaClient } from '@prisma/client';
+import { Category, PrismaClient } from '@prisma/client';
 import { hash } from 'bcryptjs';
 
 const prisma = new PrismaClient();
@@ -16,7 +16,7 @@ async function main() {
     // Re-running the seed preserves changes made by the demo user.
     if (await tx.category.count({ where: { userId: user.id } })) return;
     const names = ['Receita de clientes', 'Operação', 'Software', 'Alimentação', 'Transporte'];
-    const categories = [];
+    const categories: Category[] = [];
     for (const name of names) categories.push(await tx.category.create({ data: { name, userId: user.id } }));
     const month = new Date().toISOString().slice(0, 7);
     const rows = [

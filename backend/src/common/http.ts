@@ -23,8 +23,9 @@ export class ApiExceptionFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost) {
     let error = exception;
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      if (error.code === 'P2002') error = new ConflictException('E-mail já cadastrado.');
-      if (error.code === 'P2003') error = new ConflictException('Categoria vinculada a transações ou indisponível.');
+      const code = error.code;
+      if (code === 'P2002') error = new ConflictException('E-mail já cadastrado.');
+      if (code === 'P2003') error = new ConflictException('Categoria vinculada a transações ou indisponível.');
     }
     const response = host.switchToHttp().getResponse<Response>();
     if (error instanceof HttpException) {
