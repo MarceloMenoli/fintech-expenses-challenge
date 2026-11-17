@@ -9,6 +9,7 @@ export function Layout() {
   return <div className="app-shell">
     <aside className="sidebar">
       <Logo />
+      <button className="icon-button mobile-logout" onClick={logout} aria-label="Sair da conta"><LogOut size={18} /></button>
       <div className="workspace-label">ESPAÇO DE TRABALHO</div>
       <div className="workspace"><div className="workspace-avatar">{user.name.charAt(0).toUpperCase()}</div><div><strong>Minhas finanças</strong><small>Conta pessoal</small></div><span className="live-dot" /></div>
       <div className="nav-label">PRINCIPAL</div>
