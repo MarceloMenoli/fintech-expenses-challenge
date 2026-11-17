@@ -1,6 +1,7 @@
 require('dotenv').config();
 const url = process.env.TEST_DATABASE_URL;
-if (!url) throw new Error('Set TEST_DATABASE_URL to a dedicated database whose name ends with _test.');
+if (!url)
+  throw new Error('Set TEST_DATABASE_URL to a dedicated database whose name ends with _test.');
 const parsed = new URL(url);
 if (!parsed.pathname.endsWith('_test') || url === process.env.DATABASE_URL) {
   throw new Error('Tests require a separate database whose name ends with _test.');

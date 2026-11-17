@@ -11,3 +11,4 @@ coverage/
 tmp/
 playwright-report/
 test-results/
+backend/src/generated/

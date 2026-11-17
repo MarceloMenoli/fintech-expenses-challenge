@@ -7,7 +7,9 @@ export const publicUserSelect = { id: true, name: true, email: true } as const;
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
-  findByEmail(email: string) { return this.prisma.user.findUnique({ where: { email } }); }
+  findByEmail(email: string) {
+    return this.prisma.user.findUnique({ where: { email } });
+  }
   findPublicById(id: string) {
     return this.prisma.user.findUnique({ where: { id }, select: publicUserSelect });
   }

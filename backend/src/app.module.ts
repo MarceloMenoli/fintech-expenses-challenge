@@ -8,8 +8,13 @@ import { DashboardModule } from './dashboard/dashboard.module';
 @Controller('health')
 class HealthController {
   @Get()
-  health() { return { status: 'ok' }; }
+  health() {
+    return { status: 'ok' };
+  }
 }
 
-@Module({ imports: [PrismaModule, AuthModule, CategoriesModule, TransactionsModule, DashboardModule], controllers: [HealthController] })
+@Module({
+  imports: [PrismaModule, AuthModule, CategoriesModule, TransactionsModule, DashboardModule],
+  controllers: [HealthController],
+})
 export class AppModule {}

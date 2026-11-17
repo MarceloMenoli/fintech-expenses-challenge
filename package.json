@@ -2,17 +2,26 @@
   "name": "fintech-expenses-challenge",
   "version": "1.0.0",
   "private": true,
-  "workspaces": ["backend", "frontend"],
-  "engines": { "node": ">=22.14.0 <23", "npm": ">=10" },
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "engines": {
+    "node": ">=22.14.0 <23",
+    "npm": ">=10"
+  },
   "scripts": {
     "dev:backend": "npm run dev -w backend",
     "dev:frontend": "npm run dev -w frontend",
     "build": "npm run build --workspaces",
     "lint": "eslint backend/src backend/test backend/prisma frontend/src",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "typecheck": "npm run typecheck --workspaces",
     "test": "npm run test -w backend",
+    "test:ui": "npm run build -w backend && npm run test:ui -w frontend",
     "db:generate": "npm run db:generate -w backend",
-    "db:migrate": "npm run db:migrate -w backend",
+    "db:migrate": "npm run db:migrate -w backend --",
     "db:deploy": "npm run db:deploy -w backend",
     "db:seed": "npm run db:seed -w backend"
   },
@@ -20,6 +29,7 @@
     "@eslint/js": "^9.20.0",
     "eslint": "^9.20.0",
     "globals": "^15.14.0",
+    "prettier": "^3.10.1",
     "typescript-eslint": "^8.24.0"
   }
 }

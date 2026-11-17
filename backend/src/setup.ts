@@ -8,7 +8,8 @@ export function validateEnvironment() {
   }
   if (!process.env.FRONTEND_URL) throw new Error('FRONTEND_URL is required');
   const ttl = Number(process.env.JWT_EXPIRES_IN_SECONDS ?? 3600);
-  if (!Number.isInteger(ttl) || ttl < 60 || ttl > 86400) throw new Error('JWT_EXPIRES_IN_SECONDS must be between 60 and 86400');
+  if (!Number.isInteger(ttl) || ttl < 60 || ttl > 86400)
+    throw new Error('JWT_EXPIRES_IN_SECONDS must be between 60 and 86400');
 }
 
 export function configureApp(app: INestApplication) {
@@ -16,7 +17,11 @@ export function configureApp(app: INestApplication) {
   app.useGlobalInterceptors(new ResponseInterceptor());
   app.useGlobalFilters(new ApiExceptionFilter());
   app.enableCors({ origin: process.env.FRONTEND_URL ?? 'http://localhost:5173' });
-  app.useGlobalPipes(new ValidationPipe({
-    whitelist: true, forbidNonWhitelisted: true, transform: true,
-  }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
 }
