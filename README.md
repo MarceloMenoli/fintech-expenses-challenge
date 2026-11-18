@@ -3,7 +3,9 @@
 MVP do desafio técnico NestJS + React: registro e login, categorias, transações financeiras e dashboard com dados isolados por usuário.
 
 - **Repositório público:** https://github.com/MarceloMenoli/fintech-expenses-challenge
-- **Deploy público:** pendente da conexão às contas Railway e Vercel. Os arquivos de publicação já estão versionados; ainda não existe uma URL de produção verificada.
+- **API pública:** https://api-production-78eb2bd5.up.railway.app/api
+- **Healthcheck:** https://api-production-78eb2bd5.up.railway.app/api/health
+- **Frontend público:** publicação na Vercel pendente.
 - **Demonstração local:** http://localhost:5173
 - **Conta seed:** `demo@fluxo.app` / `Demo@2026!` — credenciais exclusivamente demonstrativas.
 
@@ -170,25 +172,31 @@ Exemplo de transação:
 
 ### API e PostgreSQL — Railway
 
-1. Criar um projeto com PostgreSQL e um serviço vinculado a este repositório, branch `master`.
-2. Manter a raiz do serviço na raiz do repositório. `railway.json` usa `backend/Dockerfile`, aplica migrations no pre-deploy e inicia `npm run start -w backend`.
+1. Criar um projeto com PostgreSQL e um serviço `api` vinculado a este repositório, branch `master`. O ambiente publicado utiliza PostgreSQL 18, versão provisionada pelo Railway; o desenvolvimento e a CI usam PostgreSQL 17.
+2. Manter a raiz do serviço na raiz do repositório e configurar no serviço: Dockerfile `backend/Dockerfile`, pre-deploy `npm run db:deploy`, inicialização `npm run start -w backend`, healthcheck `/api/health` e timeout de 120 segundos. O campo `builder` permanece `RAILPACK`; a presença do caminho do Dockerfile seleciona o build Docker. `DOCKERFILE` não é um valor válido para esse campo.
 3. Configurar `DATABASE_URL` pela referência ao banco, `JWT_SECRET` aleatório, `JWT_EXPIRES_IN_SECONDS=3600` e `FRONTEND_URL` com a origem pública da Vercel. Para o primeiro deploy, pode usar temporariamente a origem local, ajustando antes da validação pública.
 4. Gerar domínio público para a API e verificar `/api/health`.
-5. Executar `npm run db:seed` uma vez no ambiente do serviço para disponibilizar a demonstração.
+5. Executar `npm run db:seed` uma vez dentro do serviço para disponibilizar a demonstração. Se não houver acesso remoto por SSH, a conta e os mesmos dados demonstrativos podem ser criados pelas rotas autenticadas da API; essa foi a forma usada na publicação inicial.
 
 O container roda como usuário sem privilégios. O build não usa nem incorpora arquivos `.env`. O banco de desenvolvimento e o banco de testes não devem ser os de produção.
+
+O projeto publicado é [fintech-expenses-challenge no Railway](https://railway.com/project/a17c3539-01a7-4c47-a225-02a7f7332f1a), com os serviços `api` e `Postgres`. A API usa a conexão privada do banco. O CORS está temporariamente em `http://localhost:5173`; deve ser atualizado para a origem da Vercel quando o frontend for publicado.
+
+O Railway marcou `railway.json` como configuração legada e rejeita novos vínculos por esse formato. Na publicação atual, os campos acima foram aplicados diretamente ao serviço pelo CLI/API e verificados. O arquivo é mantido como referência; ao reproduzir a infraestrutura, configurar esses campos explicitamente ou usar o formato IaC atual, em vez de assumir a aplicação automática do JSON.
 
 ### Frontend — Vercel
 
 1. Importar este repositório e selecionar `frontend` como Root Directory, com preset Vite e Node 22.
 2. Usar os comandos versionados em `frontend/vercel.json`: instalação `npm ci --prefix ..`, build `npm run build` e saída `dist`, executados a partir de `frontend`. Permitir acesso aos arquivos do workspace fora da Root Directory.
-3. Definir `VITE_API_URL=https://DOMINIO_DA_API/api` e publicar. `frontend/vercel.json` encaminha as rotas da SPA para `index.html`.
+3. Definir `VITE_API_URL=https://api-production-78eb2bd5.up.railway.app/api` e publicar. `frontend/vercel.json` encaminha as rotas da SPA para `index.html`.
 4. Atualizar `FRONTEND_URL` do Railway para a origem exata publicada e fazer redeploy da API.
 5. Validar cadastro, login, categorias, transações, filtros, indicadores e acesso direto a `/transactions` por HTTPS. Atualizar os links no início deste README.
 
 ### Estado da entrega
 
-Código, migrations, seed e configuração de deploy estão implementados. A publicação efetiva e a validação das URLs de produção dependem de acesso às contas Railway e Vercel; não foram declaradas concluídas.
+API e PostgreSQL publicados no Railway em 18/11/2026, com migrations aplicadas e conta demonstrativa populada. Foram verificados por HTTPS: healthcheck, login JWT, usuário autenticado, bloqueio sem token (401), CRUD de transações, filtros combinados, atualização do dashboard e bloqueio de exclusão de categoria vinculada (409). Os registros temporários dessa validação foram removidos.
+
+Permanece pendente a publicação do frontend na Vercel, a atualização do CORS e a validação do fluxo completo na interface pública.
 
 ## Limitações conhecidas
 
