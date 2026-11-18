@@ -7,7 +7,8 @@
     "dev": "vite --host localhost",
     "build": "tsc --noEmit && vite build",
     "typecheck": "tsc --noEmit",
-    "test:ui": "playwright test"
+    "test:ui": "playwright test",
+    "test:production": "playwright test --config playwright.production.config.ts"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.66.0",
