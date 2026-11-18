@@ -5,7 +5,7 @@ MVP do desafio técnico NestJS + React: registro e login, categorias, transaçõ
 - **Repositório público:** https://github.com/MarceloMenoli/fintech-expenses-challenge
 - **API pública:** https://api-production-78eb2bd5.up.railway.app/api
 - **Healthcheck:** https://api-production-78eb2bd5.up.railway.app/api/health
-- **Frontend público:** publicação na Vercel pendente.
+- **Aplicação pública:** https://fintech-expenses-challenge-two.vercel.app
 - **Demonstração local:** http://localhost:5173
 - **Conta seed:** `demo@fluxo.app` / `Demo@2026!` — credenciais exclusivamente demonstrativas.
 
@@ -131,6 +131,19 @@ npm run test:ui
 
 `npm run format:check` verifica formatação e `npm run format` a aplica. O GitHub Actions executa lint, tipos, builds, testes de API e testes de navegador com PostgreSQL temporário.
 
+### Testar o ambiente publicado
+
+Os testes de produção usam o site da Vercel e a API do Railway, sem iniciar Docker ou servidores locais:
+
+```powershell
+$env:PLAYWRIGHT_CHANNEL = 'chrome'
+$env:PRODUCTION_WEB_URL = 'https://fintech-expenses-challenge-two.vercel.app'
+$env:PRODUCTION_API_URL = 'https://api-production-78eb2bd5.up.railway.app/api'
+npm run test:production
+```
+
+O cenário desktop cadastra uma conta isolada e valida CRUD, filtros combinados, período inválido, paginação, dashboard, isolamento entre contas e sessão. Categorias e transações criadas são removidas ao terminar; a conta vazia permanece porque o MVP não oferece exclusão de usuários. O cenário mobile usa a conta demonstrativa para validar login, indicadores, filtros, responsividade e acesso direto às rotas. Esses testes são executados explicitamente, fora da CI, para não modificar o ambiente público a cada push.
+
 ## API
 
 Rotas privadas usam `Authorization: Bearer <token>`.
@@ -180,7 +193,7 @@ Exemplo de transação:
 
 O container roda como usuário sem privilégios. O build não usa nem incorpora arquivos `.env`. O banco de desenvolvimento e o banco de testes não devem ser os de produção.
 
-O projeto publicado é [fintech-expenses-challenge no Railway](https://railway.com/project/a17c3539-01a7-4c47-a225-02a7f7332f1a), com os serviços `api` e `Postgres`. A API usa a conexão privada do banco. O CORS está temporariamente em `http://localhost:5173`; deve ser atualizado para a origem da Vercel quando o frontend for publicado.
+O projeto publicado é [fintech-expenses-challenge no Railway](https://railway.com/project/a17c3539-01a7-4c47-a225-02a7f7332f1a), com os serviços `api` e `Postgres`. A API usa a conexão privada do banco. O CORS está configurado para `https://fintech-expenses-challenge-two.vercel.app`.
 
 O Railway marcou `railway.json` como configuração legada e rejeita novos vínculos por esse formato. Na publicação atual, os campos acima foram aplicados diretamente ao serviço pelo CLI/API e verificados. O arquivo é mantido como referência; ao reproduzir a infraestrutura, configurar esses campos explicitamente ou usar o formato IaC atual, em vez de assumir a aplicação automática do JSON.
 
@@ -192,11 +205,21 @@ O Railway marcou `railway.json` como configuração legada e rejeita novos vínc
 4. Atualizar `FRONTEND_URL` do Railway para a origem exata publicada e fazer redeploy da API.
 5. Validar cadastro, login, categorias, transações, filtros, indicadores e acesso direto a `/transactions` por HTTPS. Atualizar os links no início deste README.
 
+A publicação foi feita pelo Vercel CLI. A conexão automática do repositório GitHub não foi autorizada pela integração da conta; isso não impede o deploy público. Para publicar alterações manualmente, na raiz do repositório:
+
+```powershell
+vercel login
+vercel link --yes --scope marcelomenolis-projects --project fintech-expenses-challenge
+vercel deploy --prod --yes --scope marcelomenolis-projects
+```
+
+O arquivo `.vercelignore` exclui `.env` locais, dependências, artefatos de testes e arquivos das ferramentas. Antes do primeiro upload, a lista de arquivos foi verificada com `vercel deploy --dry --json`.
+
 ### Estado da entrega
 
 API e PostgreSQL publicados no Railway em 18/11/2026, com migrations aplicadas e conta demonstrativa populada. Foram verificados por HTTPS: healthcheck, login JWT, usuário autenticado, bloqueio sem token (401), CRUD de transações, filtros combinados, atualização do dashboard e bloqueio de exclusão de categoria vinculada (409). Os registros temporários dessa validação foram removidos.
 
-Permanece pendente a publicação do frontend na Vercel, a atualização do CORS e a validação do fluxo completo na interface pública.
+Frontend publicado na Vercel e CORS da API atualizado em 18/11/2026. Os dois testes de produção passaram nas URLs públicas: fluxo desktop com cadastro, CRUD, filtros, paginação, dashboard, isolamento entre contas e sessão; fluxo mobile com conta demonstrativa, responsividade, navegação e rotas diretas. As capturas de tela foram revisadas. A aplicação está disponível para avaliação sem exigir login na Vercel.
 
 ## Limitações conhecidas
 
