@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowRight, Leaf, Plus, Sparkles } from 'lucide-react';
+import { ArrowRight, Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { api, errorMessage } from '../api';
 import { useAuth } from '../auth';
@@ -55,26 +55,6 @@ export function DashboardPage() {
           <SummaryCards summary={summary.data} />
           <div className="dashboard-middle">
             <CategoryRanking categories={summary.data.topCategories} />
-            <section className="insight-panel">
-              <div>
-                <span className="insight-icon">
-                  <Sparkles size={15} /> UM PASSO DE CADA VEZ
-                </span>
-                <h2>
-                  Pequenos registros.
-                  <br />
-                  Grandes decisões.
-                </h2>
-                <p>
-                  Manter suas movimentações em dia é o primeiro passo para uma vida financeira mais
-                  organizada.
-                </p>
-              </div>
-              <Link to="/categories">
-                Organizar minhas categorias <ArrowRight size={15} />
-              </Link>
-              <Leaf className="insight-decoration" size={83} strokeWidth={1} />
-            </section>
           </div>
         </>
       )}

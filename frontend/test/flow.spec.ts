@@ -57,7 +57,7 @@ test('registration, category CRUD, transactions, dashboard and session lifecycle
     await page.getByRole('button', { name: 'Salvar transação' }).click();
     await expect(page.getByRole('cell', { name: /1\.400,00/ })).toBeVisible();
     await page.getByRole('link', { name: 'Visão geral' }).click();
-    await expect(page.locator('.summary-card.balance .summary-value')).toHaveText(/1\.400,00/);
+    await expect(page.locator('.balance-total')).toHaveText(/1\.400,00/);
     await page.screenshot({ path: testInfo.outputPath('dashboard.png'), fullPage: true });
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
       true,

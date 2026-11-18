@@ -10,7 +10,7 @@ test('public mobile application: demo login, dashboard, filters, navigation and 
   await expect(page.getByRole('alert')).toContainText('E-mail ou senha incorretos.');
   await login(page, 'demo@fluxo.app', 'Demo@2026!');
   await expect(page.getByRole('heading', { name: /Olá, Marina/ })).toBeVisible();
-  await expect(page.locator('.summary-card.balance .summary-value')).toHaveText(/12\.936,50/);
+  await expect(page.locator('.balance-total')).toHaveText(/12\.936,50/);
   await expect(page.locator('.rank-row')).toHaveCount(3);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   const addButton = await page.getByRole('button', { name: 'Nova transação' }).boundingBox();

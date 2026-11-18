@@ -242,87 +242,125 @@ tbody tr:hover {
   min-height: 37px;
   padding: 8px 10px;
 }
-.summary-grid {
+.balance-overview {
   display: grid;
-  grid-template-columns: 1.18fr 1fr 1fr;
-  gap: 19px;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  gap: 0;
   margin-bottom: 25px;
-}
-.summary-card {
   border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 24px;
-  background: white;
-  position: relative;
+  border-radius: 16px;
   overflow: hidden;
-  min-height: 170px;
+  background: white;
 }
-.summary-card.balance {
-  color: white;
+.balance-hero {
+  padding: 32px;
   background: var(--dark);
-  border-color: var(--dark);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
 }
-.summary-top {
+.balance-label,
+.balance-scope {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  font-size: 11px;
-  color: #8b977e;
+  gap: 10px;
+  color: #c7d7c3;
+  font-size: 12px;
 }
-.summary-icon {
-  padding: 8px;
-  border: 1px solid #e9ede2;
-  border-radius: 9px;
+.balance-total {
+  font-family: 'Manrope', sans-serif;
+  font-size: clamp(30px, 3.5vw, 48px);
+  font-weight: 600;
+  letter-spacing: -1.5px;
+  margin: 20px 0 8px;
+  overflow-wrap: anywhere;
+  max-width: 100%;
+}
+.balance-hero p {
+  color: #c7d7c3;
+  font-size: 12px;
+  margin-bottom: 28px;
+}
+.balance-scope {
+  font-size: 10px;
+}
+.balance-scope .live-dot {
+  margin-left: 0;
+}
+.period-overview {
+  padding: 27px;
+}
+.period-overview > .eyebrow {
+  font-size: 9px;
+}
+.period-metric {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  padding: 20px 0;
+}
+.period-metric + .period-metric {
+  border-top: 1px solid var(--line);
+  padding-bottom: 0;
+}
+.period-metric > div {
+  min-width: 0;
+}
+.period-metric-icon {
   display: grid;
   place-items: center;
-  color: #8da16d;
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #edf3e7;
+  color: #638352;
 }
-.balance .summary-top {
-  color: #b9c9b3;
+.period-metric:last-child .period-metric-icon {
+  background: #f5eee1;
+  color: #aa8a51;
 }
-.balance .summary-icon {
-  color: #d5ecaa;
-  border-color: #ffffff18;
-  background: #ffffff05;
+.summary-top {
+  font-size: 11px;
+  color: #667663;
 }
 .summary-value {
   font-family: 'Manrope', sans-serif;
-  font-size: 29px;
+  font-size: 25px;
   font-weight: 600;
   letter-spacing: -1px;
-  margin-top: 18px;
-  position: relative;
+  margin-top: 5px;
   overflow-wrap: anywhere;
 }
 .summary-caption {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-  color: #9aab8e;
+  color: #77847b;
   font-size: 9px;
-  margin-top: 12px;
-}
-.balance .summary-caption {
-  color: #afc699;
-}
-.balance:after {
-  content: '';
-  width: 190px;
-  height: 190px;
-  border: 1px solid #ffffff09;
-  border-radius: 50%;
-  position: absolute;
-  right: -90px;
-  bottom: -110px;
-  box-shadow:
-    0 0 0 22px #ffffff03,
-    0 0 0 45px #ffffff02;
+  margin-top: 5px;
 }
 .dashboard-middle {
-  display: grid;
-  grid-template-columns: 1.35fr 1fr;
-  gap: 24px;
   margin-bottom: 26px;
+}
+.ranking-panel .category-ranking {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+.ranking-panel .rank-row {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr);
+  gap: 8px;
+  align-content: start;
+  border-bottom: 0;
+  border-top: 1px solid var(--line);
+  padding: 18px 0 0;
+}
+.ranking-panel .rank-row strong {
+  grid-column: 3;
+  font-size: 18px;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 .category-ranking {
   padding: 0 25px 25px;
@@ -359,58 +397,6 @@ tbody tr:hover {
   font-weight: 500;
   white-space: nowrap;
 }
-.insight-panel {
-  padding: 27px 28px;
-  background: #eef2e5;
-  border: 1px solid #e4ead8;
-  border-radius: 12px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 22px;
-  position: relative;
-  overflow: hidden;
-}
-.insight-panel .insight-icon {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 10px;
-  letter-spacing: 1px;
-  color: #8b9b73;
-  font-weight: 600;
-}
-.insight-panel h2 {
-  font-size: 22px;
-  line-height: 1.4;
-  letter-spacing: -0.6px;
-  max-width: 260px;
-  margin-top: 15px;
-  margin-bottom: 12px;
-}
-.insight-panel p {
-  font-size: 12px;
-  color: #8b977b;
-  max-width: 290px;
-  margin-bottom: 0;
-}
-.insight-panel a {
-  font-size: 11px;
-  color: #587443;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  position: relative;
-  width: fit-content;
-}
-.insight-decoration {
-  position: absolute;
-  right: 16px;
-  bottom: 20px;
-  color: #dfe7d0;
-  transform: rotate(-15deg);
-}
 .recent-count {
   font-size: 10px;
   color: #93a085;
@@ -433,9 +419,6 @@ tbody tr:hover {
   .filters .button {
     width: 100%;
   }
-  .summary-card {
-    padding: 20px;
-  }
   .summary-value {
     font-size: 24px;
   }
@@ -443,27 +426,36 @@ tbody tr:hover {
     align-items: flex-start;
     flex-direction: column;
   }
-  .dashboard-middle {
-    grid-template-columns: 1.3fr 1fr;
-  }
   .period-form {
     flex-wrap: wrap;
   }
 }
 @media (max-width: 760px) {
-  .summary-grid {
+  .balance-overview {
     grid-template-columns: 1fr;
-    gap: 12px;
   }
-  .summary-card {
-    min-height: 145px;
+  .balance-hero {
+    padding: 26px;
+  }
+  .balance-total {
+    font-size: 36px;
+  }
+  .period-overview {
+    padding: 24px;
   }
   .summary-value {
-    font-size: 30px;
+    font-size: 26px;
   }
-  .dashboard-middle {
+  .ranking-panel .category-ranking {
     grid-template-columns: 1fr;
-    gap: 16px;
+    gap: 18px;
+  }
+  .ranking-panel .rank-row {
+    grid-template-columns: auto auto minmax(0, 1fr) auto;
+  }
+  .ranking-panel .rank-row strong {
+    grid-column: 4;
+    font-size: 13px;
   }
   .category-grid {
     grid-template-columns: 1fr;
@@ -512,9 +504,6 @@ tbody tr:hover {
   }
   .category-ranking {
     padding: 0 18px 18px;
-  }
-  .insight-panel {
-    padding: 23px;
   }
   .mobile-logout {
     display: inline-flex;

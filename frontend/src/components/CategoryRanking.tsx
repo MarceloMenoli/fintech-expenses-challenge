@@ -5,7 +5,7 @@ import { Empty } from './Feedback';
 
 export function CategoryRanking({ categories }: { categories: Summary['topCategories'] }) {
   return (
-    <section className="panel">
+    <section className="panel ranking-panel">
       <div className="panel-heading">
         <div>
           <h2>Para onde vai seu dinheiro</h2>

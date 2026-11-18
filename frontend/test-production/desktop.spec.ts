@@ -28,7 +28,7 @@ test('public application: registration, CRUD, filters, pagination, dashboard, is
     token = ((await registration.json()) as Envelope<Session>).data.accessToken;
     const headers = { Authorization: `Bearer ${token}` };
     await expect(page.getByRole('heading', { name: /Olá, Teste/ })).toBeVisible();
-    await expect(page.locator('.summary-card.balance .summary-value')).toHaveText(/0,00/);
+    await expect(page.locator('.balance-total')).toHaveText(/0,00/);
 
     const category = await createCategory(page, 'Categoria de validação');
     categoryId = category.id;
@@ -90,7 +90,7 @@ test('public application: registration, CRUD, filters, pagination, dashboard, is
     await page.getByRole('button', { name: 'Limpar', exact: true }).click();
 
     await page.getByRole('link', { name: 'Visão geral' }).click();
-    await expect(page.locator('.summary-card.balance .summary-value')).toHaveText(/60,00/);
+    await expect(page.locator('.balance-total')).toHaveText(/60,00/);
     await expect(page.locator('.rank-name')).toHaveText('Categoria de validação');
     await page.screenshot({ path: testInfo.outputPath('dashboard-desktop.png'), fullPage: true });
 
@@ -142,7 +142,7 @@ test('public application: registration, CRUD, filters, pagination, dashboard, is
     await page.getByRole('button', { name: 'Sair da conta' }).filter({ visible: true }).click();
     await login(page, email, password);
     await expect(page.getByRole('heading', { name: /Olá, Teste/ })).toBeVisible();
-    await expect(page.locator('.summary-card.balance .summary-value')).toHaveText(/0,00/);
+    await expect(page.locator('.balance-total')).toHaveText(/0,00/);
     await page.reload();
     await expect(page).toHaveURL(/\/login$/);
   } finally {
