@@ -83,7 +83,6 @@ test('registration, category CRUD, transactions, dashboard and session lifecycle
     await page.reload();
     await expect(page).toHaveURL(/\/login$/);
   } finally {
-    // Delete only the account created by this test, in the guarded test database.
     await prisma.transaction.deleteMany({ where: { user: { email } } });
     await prisma.category.deleteMany({ where: { user: { email } } });
     await prisma.user.deleteMany({ where: { email } });

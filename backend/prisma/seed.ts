@@ -12,7 +12,6 @@ const prisma = new PrismaClient({
 
 async function main() {
   const email = 'demo@fluxo.app';
-  // This public demo password must never be reused on personal accounts.
   const passwordHash = await hash('Demo@2026!', 12);
   await prisma.$transaction(async (tx) => {
     const user = await tx.user.upsert({
@@ -20,7 +19,6 @@ async function main() {
       update: {},
       create: { name: 'Marina Costa', email, passwordHash },
     });
-    // Re-running the seed preserves changes made by the demo user.
     if (await tx.category.count({ where: { userId: user.id } })) return;
     const names = ['Receita de clientes', 'Operação', 'Software', 'Alimentação', 'Transporte'];
     const categories: Category[] = [];

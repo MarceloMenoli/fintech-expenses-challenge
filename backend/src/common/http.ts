@@ -49,7 +49,6 @@ export class ApiExceptionFilter implements ExceptionFilter {
         .json({ statusCode: error.getStatus(), error: error.name, ...detail });
       return;
     }
-    // Do not log request bodies, credentials, tokens, or database error details.
     this.logger.error(
       'Unexpected request failure',
       error instanceof Error ? error.name : 'UnknownError',

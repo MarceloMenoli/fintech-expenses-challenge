@@ -67,7 +67,6 @@ describe('Financial API (real PostgreSQL)', () => {
   });
 
   beforeEach(async () => {
-    // The environment guard only allows a dedicated *_test database.
     await prisma.transaction.deleteMany();
     await prisma.category.deleteMany();
     await prisma.user.deleteMany();

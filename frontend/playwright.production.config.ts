@@ -16,7 +16,6 @@ export default defineConfig({
     baseURL: process.env.PRODUCTION_WEB_URL,
     channel: process.env.PLAYWRIGHT_CHANNEL,
     screenshot: 'only-on-failure',
-    // Production sessions and passwords must not be recorded in network traces.
     trace: 'off',
   },
   projects: [

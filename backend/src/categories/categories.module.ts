@@ -42,7 +42,6 @@ export class CategoriesService {
   }
   async remove(id: string, userId: string) {
     await this.requireOwned(id, userId);
-    // The database restriction also protects against concurrent transaction creation.
     await this.prisma.category.delete({ where: { id_userId: { id, userId } } });
     return null;
   }
